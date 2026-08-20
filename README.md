@@ -30,10 +30,10 @@ git clone https://github.com/ignacionallar/distributed_environments_tps.git
 
 ## Instrucciones de ejecución
 
-**Abrir terminal (Ctrl + Alt + Ñ)**
-Ejecutar en el siguiente orden
-1. java ServidorCalculadora.java
-2. java ClienteCalculadora.java
+1. **Abrir terminal (Ctrl + Alt + Ñ)**
+2. java ServidorCalculadora.java
+3. **Abrir terminal (Ctrl + Alt + Ñ)**
+4. java ClienteCalculadora.java
 
 ## Analisis Teorico-Practico
 1. ¿Qué sucede con el cliente si el servidor no está ejecutándose al momento de
@@ -62,7 +62,13 @@ aula.
 
     Habilitar los permisos de Firewall necesarios de la notebook Servidor para recibir tráfico de la red.
 
+## Evidencias
+Se despliega una primera terminal, ejecutando java ServidorCalculadora.java, queda en standby esperando una conexion.
 <img width="936" height="102" alt="image" src="https://github.com/user-attachments/assets/888107f1-bafc-4a1e-944b-8a065910f181" />
+
+Se despliega una segunda termina, ejecutando java ClienteCalculadora.java, se envian los datos, los recibe y procesa el Servidor devolviendo un resultado.
 <img width="870" height="161" alt="image" src="https://github.com/user-attachments/assets/4f383b31-d4dd-493f-ace0-3a740024c4de" />
+
+Imagen del lado del Servidor en el momento de recepcion y proceso de paquete. Una vez enviado el paquete se cierra sesion.
 <img width="872" height="152" alt="image" src="https://github.com/user-attachments/assets/23165508-c015-4f52-9656-1def951816af" />
 
