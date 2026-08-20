@@ -13,6 +13,17 @@ En este repositorio se podrán encontrar todos los **trabajos prácticos realiza
 
 El repositorio contiene los diferentes trabajos prácticos, ejemplos, ejercicios y actividades desarrollados durante el trayecto de la cursada.
 
+## Requisitos Previos
+Antes de comenzar, asegúrate de tener instalado en tu sistema:
+- **Git** (para clonar el repositorio).
+- **Java Development Kit (JDK)** (versión 8 o superior, para compilar y ejecutar el código).
+
+## Clonar repositorio
+1. Abrir la terminal.
+2. Posicionarse en la carpeta donde se desee clonar el repositorio (utilizando el comando cd <NOMBRE_DE_LA_CARPETA>).
+3. Una vez posicionado en la carpeta deseada, colocar el siguiente comando:
+git clone https://github.com/ignacionallar/distributed_environments_tps.git
+
 # TP 1 - Arquitectura Cliente-Servidor y Comunicación mediante Sockets TCP
 
 ## Instrucciones de ejecución
