@@ -32,3 +32,27 @@ git clone https://github.com/ignacionallar/distributed_environments_tps.git
 Ejecutar en el siguiente orden
 1. java ServidorCalculadora.java
 2. java ClienteCalculadora.java
+
+## Analisis Teorico-Practico
+1. ¿Qué sucede con el cliente si el servidor no está ejecutándose al momento de
+intentar conectar? Muestre la excepción que lanza Java.
+    Si el servidor no está ejecutándose, no hay ningún proceso escuchando en el puerto 5500. El cliente intenta acceder, pero el sistema operativo local lo rechaza, lanzando la siguiente excepción:
+    **java.net.ConnectException: Connection refused: connect**
+
+2. Identifique en su código qué línea bloquea la ejecución del programa hasta que
+ocurre un evento de red.
+    En ServidorCalculadora.java
+    Socket socket = serverSocket.accept(); 
+    Bloquea la ejecución esperando un evento de conexión (hasta que un cliente intente conectarse).
+
+    En ClienteCalculadora.java y ServidorCalculadora.java: 
+    entrada.readLine(); 
+    Bloquea la ejecución esperando un evento de recepción de datos (hasta que llegue una cadena de texto desde el otro extremo de la red).
+
+3. Proponga qué cambios serían necesarios si dos compañeros de clase quisieran
+ejecutar el Cliente en una notebook y el Servidor en otra conectadas al Wi-Fi del
+aula.
+    ClienteCalculadora.java
+    Modificar la variable <String host = "127.0.0.1";> por la dirección IP privada de la notebook que actúa como servidor, por ejemplo: <String host = "192.168.1.45";>.
+
+    Habilitar los permisos de Firewall necesarios de la notebook Servidor para recibir tráfico de la red.
