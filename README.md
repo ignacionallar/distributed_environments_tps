@@ -79,7 +79,7 @@ Imagen del lado del Servidor en el momento de recepcion y proceso de paquete. Un
 
 ## Instrucciones de ejecución
 
-## Principal Folder: ../Desarrollo/TP_1
+## Principal Folder: ../Desarrollo/TP_2
 
 1. **Abrir terminal (Ctrl + Alt + Ñ)**
 2. java ServidorInestable.java
