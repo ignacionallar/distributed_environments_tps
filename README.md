@@ -102,3 +102,20 @@ Imagen del lado del Servidor en el momento de recepcion y proceso de paquete. Un
     
     * **Fallo Permanente:** Son errores definitivos de los cuales el sistema no puede recuperarse por sí solo o de forma automática (a menudo clasificados en la teoría como *Crash-Stop* o Caída de Nodos). Reintentar repetidamente ante un fallo de este tipo solo desperdiciará recursos de red.
     * *Ejemplo:* Un servidor que repentinamente deja de responder y no se recupera debido a que se quemó un componente físico (falla de hardware) o se cortó un cable troncal.
+
+
+## Evidencias
+Estado inicial de ClienteResiliente.java sin deplegar el servidor.
+<img width="967" height="359" alt="image" src="https://github.com/user-attachments/assets/af9b7712-7567-4985-9156-a4124533310b" />
+
+Estado modificado con metricas ejecutando ClienteResiliente.java sin desplegar el servidor.
+<img width="916" height="487" alt="image" src="https://github.com/user-attachments/assets/c3f35a40-ed29-4fbe-9119-22d9d7175bbd" />
+
+Se despliega servidor.
+<img width="933" height="80" alt="image" src="https://github.com/user-attachments/assets/29ac1b54-9ab0-4969-b93c-799367f05787" />
+
+Resultado de ClienteResiliente.java con servidor desplegado.
+<img width="878" height="404" alt="image" src="https://github.com/user-attachments/assets/8e673eaf-a6b9-42c2-b63b-ecf98776981c" />
+
+Resultado de ServidorInestable.java con la conexion exitosa de ClienteResiliente.java
+<img width="871" height="197" alt="image" src="https://github.com/user-attachments/assets/6eb179d5-5d89-4385-bb7a-1c035a968c54" />
