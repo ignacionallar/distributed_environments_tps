@@ -26,11 +26,12 @@ Antes de comenzar, asegúrate de tener instalado en tu sistema:
 3. Una vez posicionado en la carpeta deseada, colocar el siguiente comando:
 git clone https://github.com/ignacionallar/distributed_environments_tps.git
 
-# TP 1 - Arquitectura Cliente-Servidor y Comunicación mediante Sockets TCP
+<details>
+<summary>TP 1 - Arquitectura Cliente-Servidor y Comunicación mediante Sockets TCP</summary>
 
 ## Instrucciones de ejecución
 
-## Principal Folder: ../Desarrollo/TP_1
+## Principal Folder: `Desarrollo/TP_1`
 
 1. **Abrir terminal (Ctrl + Alt + Ñ)**
 2. java ServidorCalculadora.java
@@ -74,12 +75,14 @@ Se despliega una segunda termina, ejecutando java ClienteCalculadora.java, se en
 Imagen del lado del Servidor en el momento de recepcion y proceso de paquete. Una vez enviado el paquete se cierra sesion.
 <img width="872" height="152" alt="image" src="https://github.com/user-attachments/assets/23165508-c015-4f52-9656-1def951816af" />
 
+</details>
 
-# TP 2 - Modelos Fundamentales (Comunicacion, Fallo y Seguridad) y Patrones de Resiliencia.
+<details>
+<summary>TP 2 - Modelos Fundamentales (Comunicacion, Fallo y Seguridad) y Patrones de Resiliencia</summary>
 
 ## Instrucciones de ejecución
 
-## Principal Folder: ../Desarrollo/TP_2
+## Principal Folder: `Desarrollo/TP_2`
 
 1. **Abrir terminal (Ctrl + Alt + Ñ)**
 2. java ServidorInestable.java
@@ -119,3 +122,5 @@ Resultado de ClienteResiliente.java con servidor desplegado.
 
 Resultado de ServidorInestable.java con la conexion exitosa de ClienteResiliente.java
 <img width="871" height="197" alt="image" src="https://github.com/user-attachments/assets/6eb179d5-5d89-4385-bb7a-1c035a968c54" />
+
+</details>
