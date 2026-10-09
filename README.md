@@ -124,3 +124,40 @@ Resultado de ServidorInestable.java con la conexion exitosa de ClienteResiliente
 <img width="871" height="197" alt="image" src="https://github.com/user-attachments/assets/6eb179d5-5d89-4385-bb7a-1c035a968c54" />
 
 </details>
+
+<details>
+<summary>TP 3 - Sockets TCP/UDP con API java.net y Servidores Multihilo</summary>
+
+## Instrucciones de ejecución
+
+## Principal Folder: `Desarrollo/TP_3`
+
+1. **Abrir terminal (Ctrl + Alt + Ñ)**
+2. `javac ServidorTCP.java ClienteTCP.java ReceptorUDP.java EmisorUDP.java`
+3. **Abrir terminal (Ctrl + Alt + Ñ)**
+4. `java ServidorTCP`
+5. **Abrir terminales adicionales (Ctrl + Alt + Ñ)** para simular los clientes TCP:
+6. `java ClienteTCP`
+7. **Abrir terminal (Ctrl + Alt + Ñ)** para probar la resiliencia UDP:
+8. `java ReceptorUDP`
+9. **Abrir terminal (Ctrl + Alt + Ñ)**
+10. `java EmisorUDP`
+
+## Analisis Teorico-Practico
+
+1. Capa de Transporte: Explique las diferencias estructurales y operativas entre una comunicación orientada a conexión (TCP) y una sin conexión (UDP) en el contexto del paso de mensajes.
+    * **TCP (Orientado a conexión):** Estructuralmente, requiere establecer una sesión previa (Three-way handshake) entre cliente y servidor antes de transmitir datos. Operativamente, garantiza que los mensajes lleguen completos, sin errores y en el orden exacto en el que fueron enviados. Si un paquete se pierde en la red, TCP se encarga de retransmitirlo automáticamente. Es ideal para sistemas como el chat multihilo donde la integridad de la información es crítica.
+    * **UDP (Sin conexión):** Estructuralmente, envía datagramas independientes sin verificar previamente si el receptor está listo o disponible. Operativamente, no garantiza la entrega, ni el orden, ni retransmite paquetes perdidos (Fire and Forget). Al tener menos sobrecarga de control, es mucho más rápido y ligero, siendo ideal para transmisiones periódicas como la telemetría o el streaming, donde perder un dato ocasional no corrompe el flujo general.
+
+2. API java.net: ¿Cuál es la función del método ServerSocket.accept()? Justifique por qué es indispensable usar un hilo dedicado por cada cliente aceptado en un servidor TCP.
+    * La función principal de `ServerSocket.accept()` es poner al servidor en un estado de escucha bloqueante. La ejecución del hilo actual se detiene en esa línea hasta que un cliente entrante solicita una conexión. Una vez concretada, el método devuelve un objeto `Socket` único que representa ese canal de comunicación bidireccional con el cliente.
+    * Es indispensable delegar cada cliente a un hilo dedicado (Thread/Runnable) porque la lectura de flujos en Java (`in.readLine()`) también es bloqueante. Si un servidor atendiera a un cliente en su hilo principal, se quedaría atascado esperando sus mensajes y no podría volver a ejecutar el método `accept()` para recibir a nuevos usuarios, perdiendo su naturaleza concurrente.
+
+3. Manejo de Errores y Resiliencia: ¿Qué sucede si el paquete UDP enviado por el emisor se pierde en la red? ¿Cómo lo detecta el receptor con setSoTimeout()?.
+    * Debido a que UDP no implementa mecanismos de confirmación de recepción (ACK), si un datagrama se pierde en la red, el emisor no se entera del fallo y simplemente envía el siguiente paquete cuando le corresponda.
+    * Para evitar que el servidor receptor se quede esperando un paquete perdido indefinidamente en el método `receive()`, se configura `socket.setSoTimeout(5000)`. Esto establece un temporizador interno. Si transcurren 5 segundos sin que llegue ningún datagrama a la cola del socket, la API interrumpe el bloqueo y lanza una `SocketTimeoutException`. Al capturar esta excepción (try-catch), el receptor detecta la anomalía en la red, registra la advertencia y puede continuar su ciclo normal de escucha sin quedar congelado.
+
+## Evidencias
+
+
+</details>
