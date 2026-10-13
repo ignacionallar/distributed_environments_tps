@@ -158,6 +158,21 @@ Resultado de ServidorInestable.java con la conexion exitosa de ClienteResiliente
     * Para evitar que el servidor receptor se quede esperando un paquete perdido indefinidamente en el método `receive()`, se configura `socket.setSoTimeout(5000)`. Esto establece un temporizador interno. Si transcurren 5 segundos sin que llegue ningún datagrama a la cola del socket, la API interrumpe el bloqueo y lanza una `SocketTimeoutException`. Al capturar esta excepción (try-catch), el receptor detecta la anomalía en la red, registra la advertencia y puede continuar su ciclo normal de escucha sin quedar congelado.
 
 ## Evidencias
+**EJERCICIO 1**
+Ejecucion de ServidorTCP.java
+<img width="928" height="302" alt="image" src="https://github.com/user-attachments/assets/d4e64400-04ae-45c4-842d-5451b6239957" />
 
+Ejecucion de ClienteTCP.java y envio de mensjae.
+<img width="914" height="223" alt="image" src="https://github.com/user-attachments/assets/a32a4005-a825-4f2b-bab3-3729e768e94c" />
+
+Vista por parte de ServidorTCP.java
+<img width="920" height="264" alt="image" src="https://github.com/user-attachments/assets/acc42e30-132d-4094-bcfc-17de751dd6f4" />
+
+**EJERCICIO 2**
+Ejecucion de EmisorUDP.java
+<img width="925" height="233" alt="image" src="https://github.com/user-attachments/assets/e4983920-9409-4555-8685-695808edb015" />
+
+Ejecucion de ReceptorUDP.java
+<img width="921" height="235" alt="image" src="https://github.com/user-attachments/assets/0e65aa72-6144-4bb1-ae2a-686149b1e3f9" />
 
 </details>
