@@ -52,10 +52,10 @@ El servidor registra en consola cada petición (método, ruta, host del cliente)
 
 ## Instrucciones de Ejecución
 
-1. **Compilar** (desde la carpeta `Desarrollo`):
-   javac TP_7/servidor/*.java TP_7/cliente/*.java
-2. **Levantar el servidor** (terminal 1):
-   java TP_7.servidor.ServidorAPI
-3. **Ejecutar el cliente** (terminal 2):
-   java TP_7.cliente.ClienteAPI
-4. El cliente muestra un menú para listar, obtener y crear productos.
+1. **Abrir terminal (Ctrl + Alt + Ñ)** y posicionarse en la carpeta `Desarrollo`.
+2. `javac TP_7/servidor/ServidorAPI.java TP_7/cliente/ClienteAPI.java`
+3. **Abrir terminal (Ctrl + Alt + Ñ)** para levantar el servidor:
+4. `java TP_7.servidor.ServidorAPI`
+5. **Abrir terminal (Ctrl + Alt + Ñ)** para ejecutar el cliente:
+6. `java TP_7.cliente.ClienteAPI`
+7. El cliente muestra un menú para listar, obtener y crear productos.
