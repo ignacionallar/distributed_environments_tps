@@ -133,15 +133,17 @@ Resultado de ServidorInestable.java con la conexion exitosa de ClienteResiliente
 ## Principal Folder: `Desarrollo/TP_3`
 
 1. **Abrir terminal (Ctrl + Alt + Ñ)**
-2. `javac ServidorTCP.java ClienteTCP.java ReceptorUDP.java EmisorUDP.java`
-3. **Abrir terminal (Ctrl + Alt + Ñ)**
-4. `java ServidorTCP`
-5. **Abrir terminales adicionales (Ctrl + Alt + Ñ)** para simular los clientes TCP:
+2. `cd Serv_Chat_Multihilo`
+3. `java ServidorTCP`
+4. **Abrir terminales adicionales (Ctrl + Alt + Ñ)** para simular los clientes TCP:
+5. `cd Serv_Chat_Multihilo`
 6. `java ClienteTCP`
 7. **Abrir terminal (Ctrl + Alt + Ñ)** para probar la resiliencia UDP:
+8. `cd Socket_UDP`
 8. `java ReceptorUDP`
 9. **Abrir terminal (Ctrl + Alt + Ñ)**
-10. `java EmisorUDP`
+10. `cd Socket_UDP`
+11. `java EmisorUDP`
 
 ## Analisis Teorico-Practico
 
@@ -174,5 +176,165 @@ Ejecucion de EmisorUDP.java
 
 Ejecucion de ReceptorUDP.java
 <img width="921" height="235" alt="image" src="https://github.com/user-attachments/assets/0e65aa72-6144-4bb1-ae2a-686149b1e3f9" />
+
+</details>
+
+<details>
+<summary>TP 4 - Representación de Datos y Paso de Mensajes</summary>
+
+## Instrucciones de ejecución
+
+## Principal Folder: `Desarrollo/TP_4`
+
+1. **Abrir terminal (Ctrl + Alt + Ñ)**
+2. java ServidorTCP.java
+3. **Abrir terminal (Ctrl + Alt + Ñ)**
+4. java ClienteTCP.java
+
+## Análisis Teórico-Práctico
+
+## Evidencias
+
+Captura del servidor (`ServidorTCP.java`) recibiendo y deserializando la ráfaga de 1000 transacciones en ambos formatos:
+<img width="584" height="252" alt="Servidor TCP TP4" src="Desarrollo/TP_4/capturas/servidor_tp4.png" />
+
+Captura del cliente (`ClienteTCP.java`) mostrando el reporte de desempeño (JSON vs Binario):
+<img width="665" height="330" alt="Cliente TCP TP4" src="Desarrollo/TP_4/capturas/cliente_tp4.png" />
+
+</details>
+
+<details>
+<summary>TP 5 - Concurrencia y Sincronización con el Modelo de Actores</summary>
+
+## Instrucciones de ejecución
+
+## Principal Folder: `Desarrollo/TP_5`
+
+1. **Abrir terminal (Ctrl + Alt + Ñ)**
+2. java SistemaActores.java
+
+## Analisis Teórico y Demostración de las 3 Operaciones
+
+Este sistema evita completamente el uso de variables compartidas y primitivas de bloqueo (`synchronized`, `ReentrantLock`). La consistencia de los datos se logra canalizando todas las mutaciones a través de un único hilo (el Actor), demostrando las operaciones elementales:
+
+1. **Crear (Spawn):** En el archivo `SistemaActores.java`, se instancian dinámicamente el `ActorProcesador` y múltiples instancias de `ActorSensor`, cada uno con su propio ciclo de vida e hilos.
+2. **Enviar (Send):** Los actores sensores generan una ráfaga concurrente de 500 mensajes inmutables `MensajeLectura` y los envían al método `recibir()` del procesador. Este método simplemente encola (offer) los mensajes en una `ConcurrentLinkedQueue` (buzón FIFO) sin bloquear el hilo emisor.
+3. **Designar (State Change):** Dentro del bucle continuo del `ActorProcesador` (su propio método `run()`), este desencola los mensajes uno a uno y procesa el contador y la sumatoria total. Al estar aislado en un único hilo, el estado interno muta de forma segura preparándose para el próximo mensaje sin generar condiciones de carrera ni necesidad de locks.
+
+La finalización también se realiza por **paso de mensajes**: el coordinador encola un **mensaje centinela** (*poison pill*) para indicar al procesador que no hay más lecturas. De este modo no existe ninguna variable compartida entre hilos (ni siquiera un flag de control).
+
+## Diagrama de Secuencia (Paso de Mensajes)
+
+```mermaid
+sequenceDiagram
+    participant Sensor1 as ActorSensor 1
+    participant SensorN as ActorSensor N
+    participant Buzon as Mailbox (ConcurrentLinkedQueue)
+    participant Procesador as ActorProcesador
+
+    Procesador->>Procesador: 1. Crear (Spawn) e iniciar escucha
+    Sensor1->>Sensor1: 1. Crear (Spawn)
+    SensorN->>SensorN: 1. Crear (Spawn)
+
+    rect rgb(200, 220, 250)
+    Note over Sensor1, SensorN: Ráfaga Concurrente (500 Mensajes)
+    Sensor1-->>Buzon: 2. Enviar (MensajeLectura A)
+    SensorN-->>Buzon: 2. Enviar (MensajeLectura B)
+    Sensor1-->>Buzon: 2. Enviar (MensajeLectura C)
+    end
+
+    loop Procesamiento Secuencial
+        Procesador->>Buzon: Poll (Desencolar)
+        Buzon-->>Procesador: Retorna MensajeLectura
+        Procesador->>Procesador: 3. Designar / Cambio de Estado<br>(Actualiza contador y promedio)
+    end
+```
+
+## Evidencias
+
+Captura del inicio de la ráfaga concurrente y del comienzo del procesamiento secuencial de los mensajes en el buzón FIFO:
+
+<img width="618" height="412" alt="Procesamiento TP5" src="Desarrollo/TP_5/capturas/procesamiento_tp5.png" />
+
+Captura del final del procesamiento (mensajes N° 493 a 500) con el contador y el promedio final, evidenciando la ausencia de condiciones de carrera:
+
+<img width="637" height="232" alt="Resumen TP5" src="Desarrollo/TP_5/capturas/resumen_tp5.png" />
+
+</details>
+
+<details>
+<summary>TP 6 - Invocación Remota de Métodos (Java RMI)</summary>
+
+## Instrucciones de ejecución
+
+## Principal Folder: `Desarrollo/TP_6`
+
+1. **Abrir terminal (Ctrl + Alt + Ñ)**
+2. java ServidorProcesamiento.java
+3. **Abrir terminal (Ctrl + Alt + Ñ)**
+4. java ClienteProcesamiento.java
+
+## Arquitectura
+
+
+`ServicioRemoto` Interfaz remota (`extends Remote`) con los 3 métodos computacionales + la clase serializable `Estadisticas`. 
+`ServidorProcesamiento` Publica el servicio en el registro RMI y delega la lógica de negocio en `ServicioRemotoImpl`. 
+`ClienteProcesamiento` Obtiene la referencia remota vía `LocateRegistry`/`lookup` y presenta un menú interactivo.
+
+## Ejercicio 2 - Cuestionario Teórico
+
+### 1. Abstracción del Middleware
+Con **sockets puros** el desarrollador debe gestionar manualmente la conexión, los puertos, el *framing* de los mensajes, la serialización/deserialización de los datos, la concurrencia y el manejo de errores de red. **Java RMI** abstrae todas esas tareas: el cliente invoca un método sobre un **Stub** local como si el objeto fuera local, y el middleware se encarga de la conexión, el *marshalling/unmarshalling*, la localización (registro de nombres) y la traducción de fallos de red a excepciones `RemoteException`. El desarrollador solo define la interfaz y la lógica de negocio.
+
+### 2. Ciclo de Vida y Stub/Skeleton
+- **Stub (cliente):** es un *proxy* que implementa la interfaz remota. Realiza el *marshalling* de los argumentos (los convierte a bytes), los envía por la red y, al recibir la respuesta, hace el *unmarshalling* del resultado. Si algo falla, lanza `RemoteException`.
+- **Skeleton / Dispatcher (servidor):** recibe la petición, hace el *unmarshalling* de los argumentos, invoca el método real del objeto remoto y devuelve el resultado serializado. En RMI moderno el *skeleton* se genera dinámicamente (no se escribe a mano).
+
+### 3. Manejo de Fallos Parciales
+Si el servidor se interrumpe durante la ejecución de un método, el cliente recibe una excepción de la familia `RemoteException` (por ejemplo `ConnectException`, `ConnectIOException`, `UnmarshalException` o `NoSuchObjectException`). En producción deben capturarse de forma explícita, distinguir fallos transitorios (reintentables con *backoff*) de fallos permanentes, aplicar *timeouts* y degradar el servicio de forma controlada (no colgar la aplicación).
+
+## Evidencias
+
+Captura del servidor mostrando la publicación del servicio y la trazabilidad de cada invocación remota (host del cliente y operación ejecutada):
+
+<img width="822" height="250" alt="Servidor RMI TP6" src="Desarrollo/TP_6/capturas/servidor_tp6.png" />
+
+Captura del cliente mostrando el menú interactivo y los resultados de las tres operaciones remotas (estadísticas, validación de CUIT y filtro de contenido):
+
+<img width="549" height="862" alt="Cliente RMI TP6" src="Desarrollo/TP_6/capturas/cliente_tp6.png" />
+
+</details>
+
+<details>
+<summary>TP 7 - Integración entre Capas y Consumo de APIs / Servicios Distribuidos</summary>
+
+## Instrucciones de ejecución
+
+## Principal Folder: `Desarrollo/TP_7`
+
+1. **Abrir terminal (Ctrl + Alt + Ñ)**
+2. java servidor/ServidorAPI.java
+3. **Abrir terminal (Ctrl + Alt + Ñ)**
+4. java cliente/ClienteAPI.java
+
+> Informe completo (carátula, arquitectura y evidencias): [`Desarrollo/TP_7/README.md`](Desarrollo/TP_7/README.md)
+
+## Descripción
+
+API REST de **Catálogo de Productos** implementada con `com.sun.net.httpserver.HttpServer` (servidor) y `java.net.http.HttpClient` (cliente), sin frameworks externos. Expone `GET /productos`, `GET /productos/{id}` y `POST /productos`, con manejo de códigos de estado (200, 201, 400, 404, 405, 500).
+
+## Evidencias
+
+Captura 1 — Invocación exitosa (`GET /productos` → 200 + JSON):
+
+<img width="1284" height="214" alt="Invocación exitosa TP7" src="Desarrollo/TP_7/capturas/invocacion_exitosa_tp7.png" />
+
+Captura 2 — Estructura de datos (payload JSON recibido en el servidor):
+
+<img width="563" height="106" alt="Estructura de datos TP7" src="Desarrollo/TP_7/capturas/estructura_datos_tp7.png" />
+
+Captura 3 — Manejo de errores (404 y 400):
+
+<img width="752" height="340" alt="Manejo de errores TP7" src="Desarrollo/TP_7/capturas/manejo_errores_tp7.png" />
 
 </details>
