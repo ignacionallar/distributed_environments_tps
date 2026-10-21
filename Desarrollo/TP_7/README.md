@@ -11,58 +11,25 @@
 ## Diagrama de Arquitectura
 
 ```mermaid
-sequenceDiagram
-    autonumber
-    participant Cli as "ClienteAPI (Consola)"
-    participant HTTP as "Canal HTTP/1.1 (TCP :8080)"
-    participant Srv as "ServidorAPI (HttpServer)"
-
-    Note over Cli: Proceso independiente<br/>java cliente/ClienteAPI.java
-    Note over Srv: Proceso independiente<br/>java servidor/ServidorAPI.java
-
-    rect rgb(230, 240, 255)
-    Note over Cli,Srv: Captura 1 — GET /productos (200 OK)
-    Cli->>HTTP: GET /productos (HTTP/1.1)
-    HTTP->>Srv: GET /productos
-    Srv->>Srv: manejarProductos()<br/>print("GET /productos desde ...")
-    Srv->>Srv: marshalling JSON (listarProductosJson)
-    Srv-->>HTTP: 200 OK + JSON
-    HTTP-->>Cli: 200 OK + JSON
-    Cli->>Cli: unmarshalling (contarOcurrencias)<br/>print("Productos deserializados: N")
+flowchart LR
+    subgraph Cliente["Capa Cliente (proceso independiente)"]
+        C["ClienteAPI<br/>Consola + java.net.http.HttpClient"]
     end
 
-    rect rgb(230, 255, 230)
-    Note over Cli,Srv: Captura 1 — POST /productos (201 Created)
-    Cli->>Cli: marshalling payload JSON
-    Cli->>HTTP: POST /productos (payload JSON)
-    HTTP->>Srv: POST /productos
-    Srv->>Srv: print("Payload recibido -> ...")<br/>unmarshalling (parsearProducto)
-    Srv->>Srv: marshalling respuesta (creado.toJson)
-    Srv-->>HTTP: 201 Created + JSON
-    HTTP-->>Cli: 201 Created + JSON
-    Cli->>Cli: print estado + JSON
+    subgraph Canal["Canal de Comunicación"]
+        H["HTTP/1.1<br/>JSON (marshalling / unmarshalling)"]
     end
 
-    rect rgb(255, 240, 230)
-    Note over Cli,Srv: Captura 3 — Manejo de errores
-    Cli->>HTTP: GET /productos/999
-    HTTP->>Srv: GET /productos/999
-    Srv->>Srv: buscarProducto(999) -> null
-    Srv-->>HTTP: 404 Not Found + JSON
-    HTTP-->>Cli: 404 Not Found + JSON
-    Cli->>Cli: print estado 404
-
-    Cli->>HTTP: POST /productos (payload inválido)
-    HTTP->>Srv: POST /productos
-    Srv->>Srv: parsearProducto() -> null
-    Srv-->>HTTP: 400 Bad Request + JSON
-    HTTP-->>Cli: 400 Bad Request + JSON
-    Cli->>Cli: print estado 400
+    subgraph Servidor["Capa Servidor (proceso independiente)"]
+        S["ServidorAPI<br/>com.sun.net.httpserver.HttpServer"]
+        M["Almacenamiento en memoria<br/>List&lt;Producto&gt;"]
+        S --- M
     end
 
-    Note over Cli: try/catch en enviarGet() y enviarPost()<br/>captura timeout/conexión (retorna null)
-    Note over Srv: 405 Method Not Allowed y 500 Internal Server Error<br/>también manejados
-    Note over Cli,Srv: Sin frameworks externos: JDK HttpServer + HttpClient
+    C -->|"GET /productos<br/>GET /productos/{id}<br/>POST /productos"| H
+    H -->|"Request HTTP"| S
+    S -->|"200 / 201 / 400 / 404 / 405 / 500<br/>+ JSON"| H
+    H -->|"Response HTTP"| C
 ```
 
 ## Descripción del Servicio
