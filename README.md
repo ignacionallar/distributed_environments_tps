@@ -232,14 +232,16 @@ sequenceDiagram
     participant Proc as ActorProcesador
     participant Buzon as Mailbox (ConcurrentLinkedQueue)
     participant Out as Consola
-    create participant Sensor1 as "ActorSensor 1"
-    create participant SensorN as "ActorSensor N"
 
     Note over Main,Proc: 1) Crear (Spawn)
     Main->>Proc: «create» new ActorProcesador()
     Main-)Proc: start()
+
+    create participant Sensor1
     Main->>Sensor1: «create» new ActorSensor(1, proc, 50)
     Main-)Sensor1: start()
+
+    create participant SensorN
     Main->>SensorN: «create» new ActorSensor(N, proc, 50)
     Main-)SensorN: start()
     Note right of Main: N = 10 sensores en total
