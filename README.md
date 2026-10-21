@@ -227,27 +227,60 @@ La finalización también se realiza por **paso de mensajes**: el coordinador en
 
 ```mermaid
 sequenceDiagram
-    participant Sensor1 as ActorSensor 1
-    participant SensorN as ActorSensor N
+    autonumber
+    participant Main as Main / Coordinador
+    participant Proc as ActorProcesador
     participant Buzon as Mailbox (ConcurrentLinkedQueue)
-    participant Procesador as ActorProcesador
+    participant Out as Consola
+    create participant Sensor1 as "ActorSensor 1"
+    create participant SensorN as "ActorSensor N"
 
-    Procesador->>Procesador: 1. Crear (Spawn) e iniciar escucha
-    Sensor1->>Sensor1: 1. Crear (Spawn)
-    SensorN->>SensorN: 1. Crear (Spawn)
+    Note over Main,Proc: 1) Crear (Spawn)
+    Main->>Proc: «create» new ActorProcesador()
+    Main-)Proc: start()
+    Main->>Sensor1: «create» new ActorSensor(1, proc, 50)
+    Main-)Sensor1: start()
+    Main->>SensorN: «create» new ActorSensor(N, proc, 50)
+    Main-)SensorN: start()
+    Note right of Main: N = 10 sensores en total
 
-    rect rgb(200, 220, 250)
-    Note over Sensor1, SensorN: Ráfaga Concurrente (500 Mensajes)
-    Sensor1-->>Buzon: 2. Enviar (MensajeLectura A)
-    SensorN-->>Buzon: 2. Enviar (MensajeLectura B)
-    Sensor1-->>Buzon: 2. Enviar (MensajeLectura C)
+    Note over Sensor1,Buzon: 2) Enviar (Send) — ráfaga concurrente 10 x 50 = 500
+    par Envío concurrente de sensores
+        loop i = 1..50
+            Sensor1-)Proc: recibir(MensajeLectura)
+            Proc->>Buzon: offer(mensaje) [no bloqueante]
+        end
+    and
+        loop i = 1..50
+            SensorN-)Proc: recibir(MensajeLectura)
+            Proc->>Buzon: offer(mensaje) [no bloqueante]
+        end
     end
 
-    loop Procesamiento Secuencial
-        Procesador->>Buzon: Poll (Desencolar)
-        Buzon-->>Procesador: Retorna MensajeLectura
-        Procesador->>Procesador: 3. Designar / Cambio de Estado<br>(Actualiza contador y promedio)
+    Note over Proc,Buzon: 3) Designar / State Change — procesamiento secuencial
+    loop mientras el buzón no esté vacío
+        Proc->>Buzon: poll()
+        Buzon-->>Proc: MensajeLectura
+        Proc->>Proc: procesar(mensaje)
+        Note right of Proc: contadorHistorico++<br/>sumaTotal += temp<br/>promedio = sumaTotal / contador
+        Proc-)Out: print("Procesando Msg N° ...")
     end
+    Note right of Proc: si poll() == null → Thread.yield()
+
+    Note over Main,Buzon: Fin por paso de mensajes (poison pill)
+    Main-)Proc: recibirFin()
+    Note right of Main: join() de los 10 sensores antes del poison pill
+    Proc->>Buzon: offer(MENSAJE_FIN)
+    Proc->>Buzon: poll()
+    Buzon-->>Proc: MENSAJE_FIN
+    opt mensaje == MENSAJE_FIN
+        Proc->>Proc: break
+    end
+
+    Proc-)Out: print("=== PROCESAMIENTO FINALIZADO ===")
+    Proc-)Out: print("Total: N | Promedio final: X °C")
+
+    Note over Main,Out: Sin synchronized / ReentrantLock · Estado privado del ActorProcesador · Buzón FIFO lock-free
 ```
 
 ## Evidencias
