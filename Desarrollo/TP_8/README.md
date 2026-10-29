@@ -1,40 +1,45 @@
 ```mermaid
-sequenceDiagram
-    autonumber
-    participant Cliente as "App Cliente / Postman"
-    participant Backend as "Backend Node.js"
-    participant Primario as "DB Nodo Primario (Puerto 5432)"
-    participant Secundario as "DB Nodo Secundario (Puerto 5433)"
-
-    rect rgb(230, 245, 230)
-    Note over Primario, Secundario: "Replicación Streaming en Tiempo Real (WAL)"
-    Primario->>Secundario: Transmisión continua de registros WAL
+flowchart TD
+    subgraph Capa_Cliente ["Capa de Cliente"]
+        Cliente["Cliente / Postman"]
     end
 
-    rect rgb(230, 245, 230)
-    Note over Cliente, Primario: "Flujo de Escritura"
-    Cliente->>Backend: POST /api/usuarios
-    Backend->>Primario: INSERT INTO usuarios ...
-    Primario-->>Backend: OK + Registro ID
-    Backend-->>Cliente: Status 201 Created
+    subgraph Capa_Aplicacion ["Capa de Aplicación (Node.js API)"]
+        Backend["Servidor Express (index.js)"]
+        PoolP["Pool Primario (Port 5432)"]
+        PoolS["Pool Secundario (Port 5433)"]
+        
+        Backend --> PoolP
+        Backend --> PoolS
     end
 
-    rect rgb(230, 230, 245)
-    Note over Cliente, Secundario: "Flujo de Lectura"
-    Cliente->>Backend: GET /api/usuarios
-    Backend->>Secundario: SELECT * FROM usuarios ...
-    Secundario-->>Backend: OK + Datos Replicados
-    Backend-->>Cliente: Status 200 OK + Payload
+    subgraph Cluster_Docker ["Clúster PostgreSQL (Docker Compose)"]
+        subgraph DB_Primary_Node ["Nodo Primario (db-primary)"]
+            DB_Primary[("PostgreSQL 15<br/>Lectura / Escritura<br/>Puerto 5432")]
+        end
+
+        subgraph DB_Secondary_Node ["Nodo Secundario (db-secondary)"]
+            DB_Secondary[("PostgreSQL 15<br/>Réplica Solo Lectura<br/>Puerto 5433")]
+        end
+
+        DB_Primary -- "Replicación WAL (Streaming / pg_basebackup)" --> DB_Secondary
     end
 
-    rect rgb(255, 230, 230)
-    Note over Backend, Primario: "Simulación de Caída de Nodo (Failover Test)"
-    Backend->>Primario: POST /api/usuarios (nodo detenido)
-    Backend--xPrimario: Connection Refused / Timeout
-    Backend-->>Cliente: Status 500 Error Manejado
-    Cliente->>Backend: GET /api/usuarios
-    Backend->>Secundario: SELECT * FROM usuarios (Nodo Secundario activo)
-    Secundario-->>Backend: OK + Registros
-    Backend-->>Cliente: Status 200 OK (Lecturas Operativas)
-    end
+    %% Conexiones
+    Cliente -- "POST /api/usuarios (Escritura)" --> Backend
+    Cliente -- "GET /api/usuarios (Lectura)" --> Backend
+
+    PoolP -- "Lectura / Escritura" --> DB_Primary
+    PoolS -- "Solo Lectura (Hot Standby)" --> DB_Secondary
+
+    %% Estilos
+    classDef clientStyle fill:#fff3e0,stroke:#e65100,stroke-width:2px;
+    classDef appStyle fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
+    classDef primaryStyle fill:#e1f5fe,stroke:#0277bd,stroke-width:2px;
+    classDef secondaryStyle fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px;
+
+    class Cliente clientStyle;
+    class Backend,PoolP,PoolS appStyle;
+    class DB_Primary primaryStyle;
+    class DB_Secondary secondaryStyle;
 ```
