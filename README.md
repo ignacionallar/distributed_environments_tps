@@ -428,3 +428,42 @@ Captura 3 — Tolerancia a fallos: detención del nodo primario (`docker stop db
 <img width="836" height="714" alt="Tolerancia a fallos TP8" src="Desarrollo/TP_8/capturas/tolerancia_fallos_tp8.png" />
 
 </details>
+
+<details>
+<summary>TP 9 - Seguridad en Aplicaciones Distribuidas (JWT y TLS/SSL)</summary>
+
+## Instrucciones de ejecución
+
+## Principal Folder: `Desarrollo/TP_9`
+
+1. **Abrir terminal en  /servidor e instalar dependencias** -> cd Desarrollo/TP_9/servidor
+2. npm install
+3. npm start
+4. **Abrir terminal en  /cliente** -> cd Desarrollo/TP_9/cliente
+5. npm test
+
+> Diagrama de estructura: [`Desarrollo/TP_9/README.md`](Desarrollo/TP_9/README.md)
+
+## Descripción
+
+Servidor **HTTPS** construido con **Express** y certificados autofirmados TLS/SSL (OpenSSL) sobre el puerto 3443, que protege sus endpoints mediante **JWT** (`jsonwebtoken`) y control de acceso basado en roles (RBAC). Expone `GET /api/publico`, `POST /api/login`, `GET /api/perfil` (token Bearer) y `GET /api/admin` (rol `admin`), con manejo de códigos de estado 200, 400, 401 y 403, e incluye un cliente de pruebas automatizadas que valida la emisión, autorización, expiración y detección de *tampering* de los tokens.
+
+## Evidencias
+
+Captura 1 — Canal seguro HTTPS activo y emisión de JWT (`POST /api/login` → token Bearer):
+
+<img width="836" height="274" alt="Emisión JWT TP9" src="Desarrollo/TP_9/capturas/emision_jwt_tp9.png" />
+
+Captura 2 — Acceso autorizado sobre HTTPS con token válido (`GET /api/perfil` y `GET /api/admin` → HTTP 200):
+
+<img width="836" height="340" alt="Acceso autorizado TP9" src="Desarrollo/TP_9/capturas/acceso_autorizado_tp9.png" />
+
+Captura 3 — Rechazo por falta de token y por token expirado (`GET /api/perfil` → HTTP 401 `TOKEN_MISSING` / `TOKEN_EXPIRED`):
+
+<img width="836" height="296" alt="Rechazo 401 TP9" src="Desarrollo/TP_9/capturas/rechazo_401_tp9.png" />
+
+Captura 4 — Detección de *tampering* (token alterado → HTTP 401 `TOKEN_INVALID_OR_TAMPERED`) y control RBAC (rol `user` → HTTP 403 `INSUFFICIENT_PERMISSIONS`):
+
+<img width="836" height="428" alt="Tampering y RBAC TP9" src="Desarrollo/TP_9/capturas/tampering_rbac_tp9.png" />
+
+</details>
