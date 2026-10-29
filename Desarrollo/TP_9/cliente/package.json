@@ -1,0 +1,9 @@
+{
+  "name": "tp9-cliente-pruebas",
+  "version": "1.0.0",
+  "description": "Cliente de Pruebas Automatizadas para TP 9",
+  "main": "test-client.js",
+  "scripts": {
+    "test": "node test-client.js"
+  }
+}

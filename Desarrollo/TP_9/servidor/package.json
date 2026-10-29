@@ -1,0 +1,14 @@
+{
+  "name": "tp9-servidor-seguridad",
+  "version": "1.0.0",
+  "description": "TP 9 - Seguridad en Aplicaciones Distribuidas (JWT y TLS/SSL)",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "certs": "node generate-certs.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2"
+  }
+}
