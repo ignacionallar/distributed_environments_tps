@@ -32,11 +32,11 @@ flowchart TD
     PoolP -- "Lectura / Escritura" --> DB_Primary
     PoolS -- "Solo Lectura (Hot Standby)" --> DB_Secondary
 
-    %% Estilos
-    classDef clientStyle fill:#fff3e0,stroke:#e65100,stroke-width:2px;
-    classDef appStyle fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
-    classDef primaryStyle fill:#e1f5fe,stroke:#0277bd,stroke-width:2px;
-    classDef secondaryStyle fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px;
+    %% Estilos con texto negro explícito (legible en Dark y Light mode)
+    classDef clientStyle fill:#FFE0B2,stroke:#E65100,stroke-width:2px,color:#000000;
+    classDef appStyle fill:#C8E6C9,stroke:#2E7D32,stroke-width:2px,color:#000000;
+    classDef primaryStyle fill:#B3E5FC,stroke:#0277BD,stroke-width:2px,color:#000000;
+    classDef secondaryStyle fill:#E1BEE7,stroke:#6A1B9A,stroke-width:2px,color:#000000;
 
     class Cliente clientStyle;
     class Backend,PoolP,PoolS appStyle;
