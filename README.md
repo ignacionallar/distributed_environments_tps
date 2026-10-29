@@ -373,3 +373,58 @@ Captura 3 — Manejo de errores (404 y 400):
 <img width="752" height="340" alt="Manejo de errores TP7" src="Desarrollo/TP_7/capturas/manejo_errores_tp7.png" />
 
 </details>
+
+<details>
+<summary>TP 8 - Bases de Datos Distribuidas y Conexión entre Capas</summary>
+
+## Instrucciones de ejecución
+
+## Principal Folder: `Desarrollo/TP_8`
+
+1. **Abrir terminal (Ctrl + Alt + Ñ)**
+2. Permisos de ejecucion al script de inicializacion -> chmod +x 01-setup-primary.sh
+3. Desplegar el cluster con Docker Compose -> docker compose up -d
+4. Verificar ambos contenedores -> docker ps
+5. Dependencias del backend -> npm install
+6. Iniciar backend -> node index.js
+
+## Pruebas de funcionamiento
+
+1. Prueba 1 (Escritura en Primario - Puerto 5432)
+curl -X POST http://localhost:3000/api/usuarios \
+  -H "Content-Type: application/json" \
+  -d '{"nombre":"Ignacio Nallar", "email":"ignacio@ejemplo.com"}'
+
+2. Prueba 2 (Lectura y Propagacion Streaming desde Replica - Puerto 5433)
+curl http://localhost:3000/api/usuarios
+
+3. Prueba 3 (Restriccion de Solo Lectura en Replica)
+curl -X POST http://localhost:3000/api/usuarios/test-replica-write
+
+4. Prueba 4 (Tolerancia a Fallos)
+4.1 Detener el nodo primario -> docker stop db-primary
+4.2 Intentar escribir (POST /api/usuarios) y verificar que responde con error HTTP 500 controlado.
+4.3 Consultar lecturas (GET /api/usuarios) y verificar que sigue respondiendo HTTP 200 servido desde la réplica.
+4.4 Reactivar el nodo primario -> docker start db-primary
+
+> Informe completo: [`Desarrollo/TP_8/README.md`](Desarrollo/TP_8/README.md)
+
+## Descripción
+
+Base de datos distribuida **PostgreSQL** con replicación *streaming* primario/respaldo (*hot standby*) desplegada con Docker Compose, y backend **Node.js/Express** que utiliza el driver `pg` para separar cargas: las escrituras (`POST /api/usuarios`) se dirigen al nodo primario (puerto 5432) y las lecturas (`GET /api/usuarios`) a la réplica de solo lectura (puerto 5433). Incluye validación de solo lectura en la réplica y prueba de tolerancia a fallos (caída del nodo primario).
+
+## Evidencias
+
+Captura 1 — Clúster de base de datos en ejecución mostrando los dos nodos interconectados y la replicación *streaming* activa (primario con `pg_stat_replication` y secundario con `pg_stat_wal_receiver`):
+
+<img width="836" height="450" alt="Clúster TP8" src="Desarrollo/TP_8/capturas/cluster_tp8.png" />
+
+Captura 2 — Escritura exitosa en el primario (HTTP 201), lectura verificada desde la réplica *hot standby* (HTTP 200) y rechazo de escritura directa en la réplica de solo lectura:
+
+<img width="836" height="868" alt="Escritura y lectura TP8" src="Desarrollo/TP_8/capturas/escritura_lectura_tp8.png" />
+
+Captura 3 — Tolerancia a fallos: detención del nodo primario (`docker stop db-primary`), escritura rechazada con error controlado, lectura aún servida desde la réplica y posterior reactivación del primario:
+
+<img width="836" height="714" alt="Tolerancia a fallos TP8" src="Desarrollo/TP_8/capturas/tolerancia_fallos_tp8.png" />
+
+</details>
