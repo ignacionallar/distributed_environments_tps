@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  db-primary:
+    image: postgres:15-alpine
+    container_name: db-primary
+    environment:
+      POSTGRES_DB: distribuida_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: adminpassword
+      POSTGRES_REPLICATION_USER: replica_user
+      POSTGRES_REPLICATION_PASSWORD: replicapassword
+    ports:
+      - "5432:5432"
+    command: >
+      postgres
+      -c wal_level=replica
+      -c max_wal_senders=10
+      -c max_replication_slots=10
+      -c hot_standby=on
+    volumes:
+      - ./01-setup-primary.sh:/docker-entrypoint-initdb.d/01-setup-primary.sh
+      - ./02-init.sql:/docker-entrypoint-initdb.d/02-init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d distribuida_db"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+
+  db-secondary:
+    image: postgres:15-alpine
+    container_name: db-secondary
+    user: postgres
+    environment:
+      PGPASSWORD: replicapassword
+    ports:
+      - "5433:5432"
+    depends_on:
+      db-primary:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      until pg_isready -h db-primary -p 5432 -U admin; do
+        sleep 1;
+      done;
+      if [ ! -s /var/lib/postgresql/data/PG_VERSION ]; then
+        pg_basebackup -h db-primary -D /var/lib/postgresql/data -U replica_user -vP -Fp -Xs -R;
+      fi;
+      chmod 700 /var/lib/postgresql/data;
+      exec postgres -c hot_standby=on;
+      "
