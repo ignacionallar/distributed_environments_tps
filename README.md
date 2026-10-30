@@ -7,7 +7,9 @@
 
 ##  Descripción
 
-En este repositorio se podrán encontrar todos los **trabajos prácticos realizados a lo largo de la cursada** de la materia *Desarrollo de Aplicaciones para Ambientes Distribuidos*.
+Este repositorio reúne los desarrollos, informes técnicos de arquitectura y suites de prueba de los **trabajos prácticos realizados a lo largo de la cursada** de la materia *Desarrollo de Aplicaciones para Ambientes Distribuidos*.
+
+El trayecto abarca desde la comunicación en red de bajo nivel mediante Sockets y concurrencia sin bloqueos (Modelo de Actores), hasta el despliegue de arquitecturas contenedorizadas, clústeres de bases de datos distribuidas con tolerancia a fallos, esquemas de seguridad end-to-end (TLS/SSL + JWT/RBAC) y la evaluación de desempeño y punto de quiebre con Locust.
 
 ###  Contenido
 
@@ -15,9 +17,14 @@ El repositorio contiene los diferentes trabajos prácticos, ejemplos, ejercicios
 
 ## Requisitos Previos
 
-Antes de comenzar, asegúrate de tener instalado en tu sistema:
-- **Git** (para clonar el repositorio).
-- **Java Development Kit (JDK)** (versión 8 o superior, para compilar y ejecutar el código).
+Debido a que el desarrollo evoluciona a través de distintos entornos y lenguajes, asegúrate de tener instaladas las siguientes herramientas en tu sistema:
+
+* **Git:** Para el control de versiones y clonación del proyecto.
+* **Java Development Kit (JDK 11+ / JDK 8+):** Para compilar y ejecutar los módulos de Sockets TCP/UDP, Modelo de Actores, Java RMI y la API REST nativa.
+* **Node.js (v18+) & npm:** Entorno de ejecución para los servidores Express de lógica distribuida, middleware y seguridad.
+* **Docker & Docker Compose:** Para la orquestación y despliegue de contenedores (Clúster de PostgreSQL en TP 8 y API instrumentada en TP 10).
+* **Python (v3.10+) & pip:** Requerido para la ejecución de la suite de pruebas de carga y estrés con **Locust**.
+* **OpenSSL:** Necesario para la generación de certificados digitales SSL/TLS para el canal seguro HTTPS.
 
 ## Clonar repositorio
 
