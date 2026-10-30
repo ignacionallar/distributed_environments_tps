@@ -192,6 +192,13 @@ Ejecucion de ReceptorUDP.java
 4. java ClienteTCP.java
 
 ## Análisis Teórico-Práctico
+1. **Serialización y Marshalling en Sistemas Distribuidos:**
+   * La **serialización** (o *marshalling*) es el proceso de convertir objetos o estructuras de datos en memoria a un formato de secuencia de bytes apto para ser transmitido por la red.
+   * El **desmarshalling** es la operación inversa en el extremo receptor. En ambientes distribuidos heterogéneos, este proceso es indispensable para garantizar el interoperamiento entre distintas plataformas y lenguajes.
+
+2. **Comparativa de Desempeño: JSON (Texto) vs. Formato Binario:**
+   * **Tamaño del Payload:** El formato binario empaqueta los tipos de datos primarios (enteros, flotantes, timestamps) en su representación directa en bytes, logrando un peso significativamente menor en red comparado con JSON, el cual debe convertir cada número y clave a cadenas de texto ASCII/UTF-8.
+   * **Consumo de CPU / Latencia:** La serialización/deserialización binaria es más rápida a nivel computacional porque no requiere parsing de cadenas de texto ni validación de sintaxis tipográfica, reduciendo el overhead en ráfagas masivas de datos (como la prueba realizada con 1,000 transacciones).
 
 ## Evidencias
 
@@ -482,6 +489,8 @@ Captura 4 — Detección de *tampering* (token alterado → HTTP 401 `TOKEN_INVA
 5. Abrir el navegador en http://localhost:8089
 6. Configurar la cantidad de usuarios virtuales e iniciar la prueba
 > Diagrama de estructura: [`Desarrollo/TP_10/README.md`](Desarrollo/TP_10/README.md)
+
+**Entorno de Pruebas:** AMD Ryzen 3 4000 series (8 GB RAM) | Docker Desktop (Engine) | Locust (Python)
 
 ## Tablas Comparativas de Resultados
 
