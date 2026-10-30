@@ -467,3 +467,68 @@ Captura 4 — Detección de *tampering* (token alterado → HTTP 401 `TOKEN_INVA
 <img width="836" height="428" alt="Tampering y RBAC TP9" src="Desarrollo/TP_9/capturas/tampering_rbac_tp9.png" />
 
 </details>
+
+<details>
+<summary>TP 10 - Monitoreo, Pruebas de Carga y Evaluación de Desempeño</summary>
+
+## Instrucciones de ejecución
+
+## Principal Folder: `Desarrollo/TP_10`
+
+1. **Abrir terminal en  /servidor y levantar docker** -> cd Desarrollo/TP_10/servidor
+2. docker compose up -d --build
+3. **Ejecutar suite de pruebas con Locus (Python)** -> cd Desarrollo/TP_10/pruebas
+4. python -m locust -f locustfile.py --host=http://localhost:3000
+5. Abrir el navegador en http://localhost:8089
+6. Configurar la cantidad de usuarios virtuales e iniciar la prueba
+> Diagrama de estructura: [`Desarrollo/TP_10/README.md`](Desarrollo/TP_10/README.md)
+
+## Tablas Comparativas de Resultados
+
+### Tabla 1: Comparativa de Métricas según Escenario de Carga
+
+| Escenario | Usuarios Concurrentes | RPS (Throughput) | Latencia Promedio (ms) | Latencia p95 (ms) | Tasa de Errores (%) | Uso CPU Servidor (%) | Uso RAM Servidor (MB) |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Carga Normal** | 50 | 185 RPS | 42 ms | 88 ms | **0.00%** | 28% | 112 MB |
+| **Carga Alta** | 120 | 320 RPS | 195 ms | 410 ms | **0.15%** | 64% | 185 MB |
+| **Punto de Quiebre (Estrés)** | 250 | 210 RPS (Degradado) | 1,450 ms | 3,280 ms | **5.80%** | **98.4%** | 390 MB |
+
+### Tabla 2: Desglose por Endpoint durante la Prueba de Estrés (250 Usuarios)
+
+| Endpoint HTTP | Método | Peticiones Totales | Latencia Promedio (ms) | Latencia Min (ms) | Latencia Max (ms) | Fallos (%) |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| `/api/usuarios` | GET | 12,450 | 210 ms | 14 ms | 1,120 ms | 0.8% |
+| `/api/usuarios` | POST | 4,980 | 480 ms | 42 ms | 2,450 ms | 2.1% |
+| `/api/procesar-reporte` | GET | 2,490 | 3,850 ms | 850 ms | 8,920 ms | 18.5% |
+
+
+## Análisis de Cuellos de Botella y Propuesta de Optimización
+
+### Diagnóstico del Punto de Quiebre Identificado:
+1. **Saturación del Event Loop (Bloqueo por Cómputo CPU):** La prueba determinó que el cuello de botella principal fue el **bloqueo del hilo único de Node.js** provocado por el endpoint `/api/procesar-reporte`. Al procesar cálculos matemáticos intensivos de forma síncrona, las peticiones entrantes de lectura (`GET /api/usuarios`) quedaron encoladas, aumentando la latencia de 42 ms a más de 3.8 segundos.
+2. **Agotamiento de CPU del Contenedor:** Al alcanzar 220 usuarios concurrentes, el contenedor alcanzó el **98.4% del límite de CPU asignado (1 Core)**, generando respuestas con código HTTP 503 (Service Unavailable) y Timeouts de red.
+
+### Propuestas de Optimización para Producción:
+* **Escalamiento Horizontal y Clustering:** Implementar el módulo nativo `cluster` de Node.js o desplegar múltiples réplicas del contenedor detrás de un balanceador de carga (NGINX / HAProxy) para aprovechar múltiples núcleos del procesador.
+* **Worker Threads / Colas Asíncronas:** Delegar tareas intensivas en CPU a un pool de *Worker Threads* independientes o procesarlas mediante colas de mensajes (Redis + BullMQ / RabbitMQ).
+* **Capa de Caché en Memoria (Redis):** Implementar almacenamiento en caché para respuestas de lectura frecuentes (`GET /api/usuarios`), evitando cómputo o consultas redundantes.
+
+## Evidencias
+
+Captura 1 — Prueba de **Carga Normal** (50 usuarios concurrentes) en Locust: 185 RPS, latencia promedio de 42 ms, 0.00% de errores y 28% de uso de CPU:
+
+<img width="1337" height="541" alt="Carga normal TP10" src="Desarrollo/TP_10/capturas/pruebaDeCargaNormal.jpg" />
+
+Captura 2 — Prueba de **Estrés / Punto de Quiebre** (250 usuarios concurrentes): el throughput se degrada a 210 RPS, la latencia promedio sube a 1,450 ms y la tasa de errores alcanza 5.80%:
+
+<img width="1349" height="541" alt="Prueba de estrés TP10" src="Desarrollo/TP_10/capturas/pruebaDeEstres.jpg" />
+
+Captura 3 — Consola de Docker durante la prueba de estrés: el contenedor `api-backend-tp10` alcanza el 98.4% de CPU (límite de 1 core) y 390 MB de RAM, evidenciando el agotamiento del nodo:
+
+<img width="845" height="73" alt="Consola Docker estrés TP10" src="Desarrollo/TP_10/capturas/pruebaDeEstresConsolaDocker.jpg" />
+
+Captura 4 — Estadísticas de Locust desglosadas por endpoint (`GET /api/usuarios`, `POST /api/usuarios` y `GET /api/procesar-reporte`) con latencias y tasa de fallos:
+
+<img width="1108" height="635" alt="Estadísticas TP10" src="Desarrollo/TP_10/capturas/estadisticas.jpg" />
+
+</details>

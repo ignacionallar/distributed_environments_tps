@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  api-backend:
+    build: .
+    container_name: api-backend-tp10
+    ports:
+      - "3000:3000"
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+    restart: unless-stopped
